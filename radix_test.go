@@ -36,6 +36,40 @@ func TestSorting(t *testing.T) {
 	}
 }
 
+var (
+	xs10     = pop(make([]int32, 10))
+	xs100    = pop(make([]int32, 100))
+	xs1000   = pop(make([]int32, 1000))
+	xs10000  = pop(make([]int32, 10000))
+	xs100000 = pop(make([]int32, 1000000))
+)
+
+func Benchmark_Int32_RadixMSB_10(b *testing.B)     { benchmarkInt32(b, Int32MSB, xs10) }
+func Benchmark_Int32_RadixMSB_100(b *testing.B)    { benchmarkInt32(b, Int32MSB, xs100) }
+func Benchmark_Int32_RadixMSB_1000(b *testing.B)   { benchmarkInt32(b, Int32MSB, xs1000) }
+func Benchmark_Int32_RadixMSB_10000(b *testing.B)  { benchmarkInt32(b, Int32MSB, xs10000) }
+func Benchmark_Int32_RadixMSB_100000(b *testing.B) { benchmarkInt32(b, Int32MSB, xs100000) }
+
+func Benchmark_Int32_RadixLSB_10(b *testing.B)     { benchmarkInt32(b, Int32LSB, xs10) }
+func Benchmark_Int32_RadixLSB_100(b *testing.B)    { benchmarkInt32(b, Int32LSB, xs100) }
+func Benchmark_Int32_RadixLSB_1000(b *testing.B)   { benchmarkInt32(b, Int32LSB, xs1000) }
+func Benchmark_Int32_RadixLSB_10000(b *testing.B)  { benchmarkInt32(b, Int32LSB, xs10000) }
+func Benchmark_Int32_RadixLSB_100000(b *testing.B) { benchmarkInt32(b, Int32LSB, xs100000) }
+
+func Benchmark_Int32_StdSort_10(b *testing.B)     { benchmarkInt32(b, stdSort, xs10) }
+func Benchmark_Int32_StdSort_100(b *testing.B)    { benchmarkInt32(b, stdSort, xs100) }
+func Benchmark_Int32_StdSort_1000(b *testing.B)   { benchmarkInt32(b, stdSort, xs1000) }
+func Benchmark_Int32_StdSort_10000(b *testing.B)  { benchmarkInt32(b, stdSort, xs10000) }
+func Benchmark_Int32_StdSort_100000(b *testing.B) { benchmarkInt32(b, stdSort, xs100000) }
+
+func benchmarkInt32(b *testing.B, sorter func([]int32), xs []int32) {
+	ys := make([]int32, len(xs))
+	copy(ys, xs)
+	for n := 0; n < b.N; n++ {
+		sorter(xs)
+	}
+}
+
 func TestMain(t *testing.T) {
 	const (
 		rep = 5
