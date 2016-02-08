@@ -195,4 +195,4 @@ func shell(xs []int32) {
 	}
 }
 
-var blabla = fmt.Println
+var _bla = fmt.Println

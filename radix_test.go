@@ -8,6 +8,34 @@ import (
 	"time"
 )
 
+func TestSorting(t *testing.T) {
+	data := [][]int32{
+		pop([]int32{}),
+		pop(make([]int32, 10)),
+		pop(make([]int32, 1000)),
+		pop(make([]int32, 100000)),
+	}
+
+	sorter := []func([]int32){
+		Int32MSB,
+		Int32LSB,
+		stdSort,
+		//insertion,  // too slow
+		//shell,			// too slow
+	}
+
+	for _, d := range data {
+		for _, s := range sorter {
+			xs := make([]int32, len(d))
+			copy(xs, d)
+			s(xs)
+			if !sort.IsSorted(byInt32(xs)) {
+				t.Errorf("was not sorted")
+			}
+		}
+	}
+}
+
 func TestMain(t *testing.T) {
 	const (
 		rep = 5
@@ -31,42 +59,22 @@ func TestMain(t *testing.T) {
 		tot += e.UnixNano() - s.UnixNano()
 	}
 
-	// TODO: replace with sort pkg
-	fmt.Println(Ints32AreSorted(xs), tot/rep)
+	fmt.Println(sort.IsSorted(byInt32(xs)), tot/rep)
 }
 
-func pop(xs []int32) {
+func stdSort(xs []int32) {
+	sort.Sort(byInt32(xs))
+}
+
+func pop(xs []int32) []int32 {
 	for i := range xs {
 		xs[i] = int32(rand.Int())
 		if rand.Int()&1 == 1 {
 			xs[i] = ^xs[i]
 		}
 	}
+	return xs
 }
-
-func print(xs []int32) {
-	for _, x := range xs {
-		fmt.Println(x)
-	}
-}
-
-func Ints32AreSorted(xs []int32) bool {
-	if len(xs) < 2 {
-		return true
-	}
-	y := xs[0]
-	for _, x := range xs {
-		if y > x {
-			return false
-		}
-		y = x
-	}
-	return true
-}
-
-var (
-	bla = sort.Ints
-)
 
 type byInt32 []int32
 
