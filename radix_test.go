@@ -1,11 +1,9 @@
 package radix
 
 import (
-	"fmt"
 	"math/rand"
 	"sort"
 	"testing"
-	"time"
 )
 
 func TestSorting(t *testing.T) {
@@ -68,32 +66,6 @@ func benchmarkInt32(b *testing.B, sorter func([]int32), xs []int32) {
 	for n := 0; n < b.N; n++ {
 		sorter(xs)
 	}
-}
-
-func TestMain(t *testing.T) {
-	const (
-		rep = 5
-		ln  = 200000 // crossing MSB/LSB @ ~200000
-	)
-
-	var (
-		xs  = make([]int32, ln)
-		tot = int64(0)
-	)
-
-	for i := 0; i < rep; i++ {
-		pop(xs)
-
-		s := time.Now()
-		//radix.Int32MSB(xs)
-		//radix.Int32LSB(xs)
-		sort.Sort(byInt32(xs))
-		e := time.Now()
-
-		tot += e.UnixNano() - s.UnixNano()
-	}
-
-	fmt.Println(sort.IsSorted(byInt32(xs)), tot/rep)
 }
 
 func stdSort(xs []int32) {
