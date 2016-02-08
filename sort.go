@@ -1,4 +1,5 @@
-// TODO: descr
+// package radix provides radix sort for int32 by most significant bit and least
+// significant bit.
 package radix
 
 import (
