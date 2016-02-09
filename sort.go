@@ -50,26 +50,69 @@ func Int32MSB(xs []int32) {
 	radSortAt(xs, ys, &cs, &is, 1<<7, 24)
 
 	// partially sort every radix bucket by with secondary radix sort when count is too high
-	var lo, hi uint32
+	var lo uint32
 	for i := 0; i < 256; i++ {
-		c := cs[i]
-		if c == 0 {
+		var (
+			c  = cs[i]
+			hi = lo + c
+			zs = xs[lo:hi]
+		)
+		lo = hi
+
+		if c < 2 { // already sorted
 			continue
 		}
-		hi = lo + c
-		zs := xs[lo:hi]
 		if c > 20000 {
-			var ds [256]uint32
-			radSortAt(zs, ys, &ds, &ds, 0, 8)
+			for i := 0; i < 256; i++ {
+				is[i] = 0
+			}
+			radSortAt(zs, ys, &is, &is, 0, 8)
 		}
 		if c > 100 {
-			var ds [256]uint32
-			radSortAt(zs, ys, &ds, &ds, 0, 16)
+			for i := 0; i < 256; i++ {
+				is[i] = 0
+			}
+			radSortAt(zs, ys, &is, &is, 0, 16)
 		}
-		lo = hi
+		int32_insertion(zs) // ~linear runtime when globally sorted, locally not-sorted
+	}
+}
+
+func radSortAt_rec(xs, temp []int32, offset int32, shift uint) {
+	var cs, is [256]uint32
+	count(xs, &cs, offset, shift)
+	integr(&cs, &is)
+	swap(xs, temp, &is, offset, shift)
+
+	if shift == 0 { // that was the last radix bucket
+		return
 	}
 
-	int32_insertion(xs) // ~linear runtime when globally sorted, locally not-sorted
+	var lo uint32
+	for i := 0; i < 256; i++ {
+		var (
+			c  = cs[i]
+			hi = lo + c
+			zs = xs[lo:hi]
+		)
+		lo = hi
+
+		switch {
+		case c < 2: // already sorted
+		case c <= 100:
+			int32_insertion(zs)
+		default:
+			radSortAt_rec(zs, temp, 0, shift-8)
+		}
+	}
+}
+
+func Int32MSB_alt(xs []int32) {
+	if len(xs) <= 64 {
+		int32_insertion(xs)
+		return
+	}
+	radSortAt_rec(xs, make([]int32, len(xs)), 1<<7, 24)
 }
 
 // Int32LSB sorts in place the given array of int32 numbers using least
