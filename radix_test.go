@@ -72,6 +72,33 @@ func benchmarkInt32(b *testing.B, sorter func([]int32), size int) {
 	}
 }
 
+func Benchmark_Int32LastBucket_RadixMSB_10000(b *testing.B) {
+	benchmarkInt32LastBucket(b, Int32MSB, 10000)
+}
+func Benchmark_Int32LastBucket_RadixMSBalt_10000(b *testing.B) {
+	benchmarkInt32LastBucket(b, Int32MSB_alt, 10000)
+}
+func Benchmark_Int32LastBucket_RadixLSB_10000(b *testing.B) {
+	benchmarkInt32LastBucket(b, Int32LSB, 10000)
+}
+func Benchmark_Int32LastBucket_StdSort_10000(b *testing.B) {
+	benchmarkInt32LastBucket(b, stdSort, 10000)
+}
+
+func benchmarkInt32LastBucket(b *testing.B, sorter func([]int32), size int) {
+	ys := make([][]int32, b.N)
+	for n := range ys {
+		ys[n] = pop(size)
+		for i := range ys[n] {
+			ys[n][i] = ys[n][i] & 0xFF
+		}
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		sorter(ys[n])
+	}
+}
+
 func stdSort(xs []int32) {
 	sort.Sort(byInt32(xs))
 }
