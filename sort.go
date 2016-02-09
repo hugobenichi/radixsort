@@ -8,125 +8,67 @@ import (
 
 func integr(cs, is *[256]uint32) {
 	a := uint32(0)
-	for i, c := range cs {
+	for i := 0; i < 256; i++ {
+		c := cs[i]
 		is[i] = a
 		a += c
 	}
 }
 
-func count(xs []int32, cs *[256]uint32, rad func(int32) int32) {
+func count(xs []int32, cs *[256]uint32, offset int32, shift uint) {
 	for _, x := range xs {
-		cs[rad(x)]++
+		r := (offset + (x >> shift)) & 0xFF
+		cs[r]++
 	}
 }
 
-func radSwap(xs, ys []int32, is *[256]uint32, rad func(int32) int32) {
+func swap(xs, ys []int32, is *[256]uint32, offset int32, shift uint) {
 	for _, x := range xs {
-		r := rad(x)
+		r := (offset + (x >> shift)) & 0xFF
 		ys[is[r]] = x
 		is[r]++
 	}
 	copy(xs, ys)
 }
 
-func signedrad(x int32) int32 { // int is 64 bits
-	// translate by +128 for signed radix order
-	return ((1 << 7) + (x >> 24)) & 0xFF
-}
-
-func rad(x int32) int32 {
-	return (x >> 24) & 0xff
-}
-
-func radAt(shift uint) func(int32) int32 {
-	return func(x int32) int32 {
-		return (x >> shift) & 0xff
-	}
-}
-
-func radSortAt(xs, ys []int32, cs, is *[256]uint32, rad func(int32) int32) {
-	count(xs, cs, rad)
+func radSortAt(xs, ys []int32, cs, is *[256]uint32, offset int32, shift uint) {
+	count(xs, cs, offset, shift)
 	integr(cs, is)
-	radSwap(xs, ys, is, rad)
+	swap(xs, ys, is, offset, shift)
 }
 
 func Int32MSB(xs []int32) {
+	if len(xs) <= 64 {
+		int32_insertion(xs)
+		return
+	}
+
 	var (
 		cs, is [256]uint32
 		ys     = make([]int32, len(xs))
 	)
-
-	for _, x := range xs {
-		cs[signedrad(x)]++
-	}
-	a := uint32(0)
-	for i, c := range cs {
-		is[i] = a
-		a += c
-	}
-	for _, x := range xs {
-		r := signedrad(x)
-		ys[is[r]] = x
-		is[r]++
-	}
-	for i := range xs {
-		xs[i] = ys[i]
-	}
+	radSortAt(xs, ys, &cs, &is, 1<<7, 24)
 
 	// partially sort every radix bucket by with secondary radix sort when count is too high
 	var lo, hi uint32
-	for _, c := range cs {
+	for i := 0; i < 256; i++ {
+		c := cs[i]
 		if c == 0 {
 			continue
 		}
 		hi = lo + c
 		zs := xs[lo:hi]
 		if c > 20000 {
-			for i := range is {
-				is[i] = 0
-			}
-			for _, x := range zs {
-				r := (x >> 8) & 0xFF
-				is[r]++
-			}
-			a = uint32(0)
-			for i, c := range is {
-				is[i] = a
-				a += c
-			}
-			for _, x := range zs {
-				r := (x >> 8) & 0xFF
-				ys[is[r]] = x
-				is[r]++
-			}
-			for i := range zs {
-				zs[i] = ys[i]
-			}
+			var ds [256]uint32
+			radSortAt(zs, ys, &ds, &ds, 0, 8)
 		}
-		if c > 255 {
-			for i := range is {
-				is[i] = 0
-			}
-			for _, x := range zs {
-				r := (x >> 16) & 0xFF
-				is[r]++
-			}
-			a = uint32(0)
-			for i, c := range is {
-				is[i] = a
-				a += c
-			}
-			for _, x := range zs {
-				r := (x >> 16) & 0xFF
-				ys[is[r]] = x
-				is[r]++
-			}
-			for i := range zs {
-				zs[i] = ys[i]
-			}
+		if c > 100 {
+			var ds [256]uint32
+			radSortAt(zs, ys, &ds, &ds, 0, 16)
 		}
 		lo = hi
 	}
+
 	int32_insertion(xs) // ~linear runtime when globally sorted, locally not-sorted
 }
 
