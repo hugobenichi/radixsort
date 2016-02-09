@@ -45,6 +45,12 @@ func Benchmark_Int32_StdSort_1000(b *testing.B)   { benchmarkInt32(b, stdSort, 1
 func Benchmark_Int32_StdSort_10000(b *testing.B)  { benchmarkInt32(b, stdSort, 10000) }
 func Benchmark_Int32_StdSort_100000(b *testing.B) { benchmarkInt32(b, stdSort, 100000) }
 
+func Benchmark_Int32_Insertion_10(b *testing.B)  { benchmarkInt32(b, int32_insertion, 10) }
+func Benchmark_Int32_Insertion_32(b *testing.B)  { benchmarkInt32(b, int32_insertion, 32) }
+func Benchmark_Int32_Insertion_50(b *testing.B)  { benchmarkInt32(b, int32_insertion, 50) }
+func Benchmark_Int32_Insertion_64(b *testing.B)  { benchmarkInt32(b, int32_insertion, 64) }
+func Benchmark_Int32_Insertion_100(b *testing.B) { benchmarkInt32(b, int32_insertion, 100) }
+
 func benchmarkInt32(b *testing.B, sorter func([]int32), size int) {
 	ys := make([][]int32, b.N)
 	for n := range ys {

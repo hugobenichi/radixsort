@@ -127,17 +127,28 @@ func Int32MSB(xs []int32) {
 		}
 		lo = hi
 	}
-	insertion(xs) // efficient when partially sorted
+	int32_insertion(xs) // ~linear runtime when globally sorted, locally not-sorted
 }
 
+// Int32LSB sorts in place the given array of int32 numbers using least
+// significant digit radix sort. It uses additional swap space equal to the
+// given array length. When the length of the given array is equal or less than
+// 64, insertion sort is used instead.
 func Int32LSB(xs []int32) {
-	var css [4][256]uint32
+	if len(xs) <= 64 {
+		int32_insertion(xs)
+		return
+	}
+
+	var css [4][256]uint32 // should be living on the stack
+
+	// count all radix keys
 	for _, x := range xs {
 		var (
 			a = x & 0xFF
 			b = (x >> 8) & 0xFF
 			c = (x >> 16) & 0xFF
-			d = ((1 << 7) + (x >> 24)) & 0xFF
+			d = ((1 << 7) + (x >> 24)) & 0xFF // translate by +128 for signed order
 		)
 		css[0][a]++
 		css[1][b]++
@@ -145,28 +156,39 @@ func Int32LSB(xs []int32) {
 		css[3][d]++
 	}
 
-	ys := make([]int32, len(xs))
-	shift := uint(0)
-	offset := int32(0)
+	// aggregate radix counts to radix offsets
 	for i := range css {
-		cs := css[i]
-		integr(&cs, &cs)
+		cs := &css[i]
+		a := uint32(0)
+		for j := 0; j < 256; j++ {
+			c := cs[j]
+			cs[j] = a
+			a += c
+		}
+	}
+
+	var (
+		ys = make([]int32, len(xs)) // temp array for swapping elements
+		ss = [4]uint{0, 8, 16, 24}
+		os = [4]int32{0, 0, 0, 1 << 7}
+	)
+	for i := range css {
+		var (
+			cs     = css[i] // do not obtain cs from range expr
+			shift  = ss[i]
+			offset = os[i]
+		)
 		for _, x := range xs {
 			r := (offset + (x >> shift)) & 0xFF
 			j := cs[r]
 			cs[r]++
 			ys[j] = x
 		}
-		offset = 0
-		xs, ys = ys, xs
-		shift += 8
-		if shift == 24 {
-			offset = 1 << 7
-		}
+		xs, ys = ys, xs // even number of swap
 	}
 }
 
-func insertion(xs []int32) {
+func int32_insertion(xs []int32) {
 	for i := 1; i < len(xs); i++ {
 		j, x := i, xs[i]
 		//a := 0
@@ -196,4 +218,4 @@ func shell(xs []int32) {
 	}
 }
 
-var _bla = fmt.Println
+var _not_used = fmt.Println

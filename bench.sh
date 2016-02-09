@@ -9,5 +9,5 @@ go test -bench=. radix \
   | tr '_' ' ' \
   | awk '{print $2, $4, $3, $6}' \
   | sort -nk 4 \
-  | sort -snk 2 \
+  | sort -snrk 2 \
   | sort -snk 1
