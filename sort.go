@@ -6,35 +6,23 @@ import (
 	"fmt"
 )
 
-func integr(cs, is *[256]uint32) {
+func int32_sortAtRadix(xs, ys []int32, cs, is *[256]uint32, offset int32, shift uint) {
+	for _, x := range xs {
+		r := (offset + (x >> shift)) & 0xFF
+		cs[r]++
+	}
 	a := uint32(0)
 	for i := 0; i < 256; i++ {
 		c := cs[i]
 		is[i] = a
 		a += c
 	}
-}
-
-func count(xs []int32, cs *[256]uint32, offset int32, shift uint) {
-	for _, x := range xs {
-		r := (offset + (x >> shift)) & 0xFF
-		cs[r]++
-	}
-}
-
-func swap(xs, ys []int32, is *[256]uint32, offset int32, shift uint) {
 	for _, x := range xs {
 		r := (offset + (x >> shift)) & 0xFF
 		ys[is[r]] = x
 		is[r]++
 	}
 	copy(xs, ys)
-}
-
-func radSortAt(xs, ys []int32, cs, is *[256]uint32, offset int32, shift uint) {
-	count(xs, cs, offset, shift)
-	integr(cs, is)
-	swap(xs, ys, is, offset, shift)
 }
 
 func Int32MSB(xs []int32) {
@@ -47,7 +35,7 @@ func Int32MSB(xs []int32) {
 		cs, is [256]uint32
 		ys     = make([]int32, len(xs))
 	)
-	radSortAt(xs, ys, &cs, &is, 1<<7, 24)
+	int32_sortAtRadix(xs, ys, &cs, &is, 1<<7, 24)
 
 	// partially sort every radix bucket by with secondary radix sort when count is too high
 	var lo uint32
@@ -66,23 +54,35 @@ func Int32MSB(xs []int32) {
 			for i := 0; i < 256; i++ {
 				is[i] = 0
 			}
-			radSortAt(zs, ys, &is, &is, 0, 8)
+			int32_sortAtRadix(zs, ys, &is, &is, 0, 8)
 		}
 		if c > 100 {
 			for i := 0; i < 256; i++ {
 				is[i] = 0
 			}
-			radSortAt(zs, ys, &is, &is, 0, 16)
+			int32_sortAtRadix(zs, ys, &is, &is, 0, 16)
 		}
 		int32_insertion(zs) // ~linear runtime when globally sorted, locally not-sorted
 	}
 }
 
-func radSortAt_rec(xs, temp []int32, offset int32, shift uint) {
+func int32_sortAtRadix_rec(xs, temp []int32, offset int32, shift uint) {
 	var cs, is [256]uint32
-	count(xs, &cs, offset, shift)
-	integr(&cs, &is)
-	swap(xs, temp, &is, offset, shift)
+	for _, x := range xs {
+		r := (offset + (x >> shift)) & 0xFF
+		cs[r]++
+	}
+	a := uint32(0)
+	for i := 0; i < 256; i++ {
+		is[i] = a
+		a += cs[i]
+	}
+	for _, x := range xs {
+		r := (offset + (x >> shift)) & 0xFF
+		temp[is[r]] = x
+		is[r]++
+	}
+	copy(xs, temp)
 
 	if shift == 0 { // that was the last radix bucket
 		return
@@ -102,7 +102,7 @@ func radSortAt_rec(xs, temp []int32, offset int32, shift uint) {
 		case c <= 100:
 			int32_insertion(zs)
 		default:
-			radSortAt_rec(zs, temp, 0, shift-8)
+			int32_sortAtRadix_rec(zs, temp, 0, shift-8)
 		}
 	}
 }
@@ -112,7 +112,7 @@ func Int32MSB_alt(xs []int32) {
 		int32_insertion(xs)
 		return
 	}
-	radSortAt_rec(xs, make([]int32, len(xs)), 1<<7, 24)
+	int32_sortAtRadix_rec(xs, make([]int32, len(xs)), 1<<7, 24)
 }
 
 // Int32LSB sorts in place the given array of int32 numbers using least
