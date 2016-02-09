@@ -202,20 +202,4 @@ func int32_insertion(xs []int32) {
 	}
 }
 
-var gaps = []int{57, 23, 10, 4, 1}
-
-func shell(xs []int32) {
-	for _, g := range gaps {
-		for i := g; i < len(xs); i++ {
-			x := xs[i]
-			j := i
-			for j >= g && xs[j-g] > x {
-				xs[j] = xs[j-g]
-				j -= g
-			}
-			xs[j] = x
-		}
-	}
-}
-
 var _not_used = fmt.Println
