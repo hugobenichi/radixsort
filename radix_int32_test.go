@@ -37,10 +37,10 @@ func Benchmark_Int32_RadixLSB_1000(b *testing.B)   { benchmarkInt32(b, Int32LSB,
 func Benchmark_Int32_RadixLSB_10000(b *testing.B)  { benchmarkInt32(b, Int32LSB, 10000) }
 func Benchmark_Int32_RadixLSB_100000(b *testing.B) { benchmarkInt32(b, Int32LSB, 100000) }
 
-func Benchmark_Int32_StdSort_100(b *testing.B)    { benchmarkInt32(b, int32_stdSort, 100) }
-func Benchmark_Int32_StdSort_1000(b *testing.B)   { benchmarkInt32(b, int32_stdSort, 1000) }
-func Benchmark_Int32_StdSort_10000(b *testing.B)  { benchmarkInt32(b, int32_stdSort, 10000) }
-func Benchmark_Int32_StdSort_100000(b *testing.B) { benchmarkInt32(b, int32_stdSort, 100000) }
+func Benchmark_Int32_StandardSort_100(b *testing.B)    { benchmarkInt32(b, int32_stdSort, 100) }
+func Benchmark_Int32_StandardSort_1000(b *testing.B)   { benchmarkInt32(b, int32_stdSort, 1000) }
+func Benchmark_Int32_StandardSort_10000(b *testing.B)  { benchmarkInt32(b, int32_stdSort, 10000) }
+func Benchmark_Int32_StandardSort_100000(b *testing.B) { benchmarkInt32(b, int32_stdSort, 100000) }
 
 func Benchmark_Int32_Insertion_100(b *testing.B) { benchmarkInt32(b, int32_insertion, 100) }
 
@@ -50,7 +50,7 @@ func Benchmark_Int32LastBucket_RadixMSB_10000(b *testing.B) {
 func Benchmark_Int32LastBucket_RadixLSB_10000(b *testing.B) {
 	benchmarkInt32LastBucket(b, Int32LSB, 10000)
 }
-func Benchmark_Int32LastBucket_StdSort_10000(b *testing.B) {
+func Benchmark_Int32LastBucket_StandardSort_10000(b *testing.B) {
 	benchmarkInt32LastBucket(b, int32_stdSort, 10000)
 }
 

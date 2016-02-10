@@ -37,10 +37,10 @@ func Benchmark_Int64_RadixLSB_1000(b *testing.B)   { benchmarkInt64(b, Int64LSB,
 func Benchmark_Int64_RadixLSB_10000(b *testing.B)  { benchmarkInt64(b, Int64LSB, 10000) }
 func Benchmark_Int64_RadixLSB_100000(b *testing.B) { benchmarkInt64(b, Int64LSB, 100000) }
 
-func Benchmark_Int64_StdSort_100(b *testing.B)    { benchmarkInt64(b, int64_stdSort, 100) }
-func Benchmark_Int64_StdSort_1000(b *testing.B)   { benchmarkInt64(b, int64_stdSort, 1000) }
-func Benchmark_Int64_StdSort_10000(b *testing.B)  { benchmarkInt64(b, int64_stdSort, 10000) }
-func Benchmark_Int64_StdSort_100000(b *testing.B) { benchmarkInt64(b, int64_stdSort, 100000) }
+func Benchmark_Int64_StandardSort_100(b *testing.B)    { benchmarkInt64(b, int64_stdSort, 100) }
+func Benchmark_Int64_StandardSort_1000(b *testing.B)   { benchmarkInt64(b, int64_stdSort, 1000) }
+func Benchmark_Int64_StandardSort_10000(b *testing.B)  { benchmarkInt64(b, int64_stdSort, 10000) }
+func Benchmark_Int64_StandardSort_100000(b *testing.B) { benchmarkInt64(b, int64_stdSort, 100000) }
 
 func Benchmark_Int64_Insertion_100(b *testing.B) { benchmarkInt64(b, int64_insertion, 100) }
 
