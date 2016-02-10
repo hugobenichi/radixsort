@@ -66,8 +66,8 @@ func Int32MSB(xs []int32) {
 	}
 }
 
-func int32_sortAtRadix_rec(xs, temp []int32, offset int32, shift uint) {
-	var cs, is [256]uint32
+func int32_sortAtRadix_rec(xs, temp []int32, is *[256]uint32, offset int32, shift uint) {
+	var cs [256]uint32
 	for _, x := range xs {
 		r := (offset + (x >> shift)) & 0xFF
 		cs[r]++
@@ -102,7 +102,7 @@ func int32_sortAtRadix_rec(xs, temp []int32, offset int32, shift uint) {
 		case c <= 100:
 			int32_insertion(zs)
 		default:
-			int32_sortAtRadix_rec(zs, temp, 0, shift-8)
+			int32_sortAtRadix_rec(zs, temp, is, 0, shift-8)
 		}
 	}
 }
@@ -112,7 +112,11 @@ func Int32MSB_alt(xs []int32) {
 		int32_insertion(xs)
 		return
 	}
-	int32_sortAtRadix_rec(xs, make([]int32, len(xs)), 1<<7, 24)
+	var (
+		temp = make([]int32, len(xs))
+		is   [256]uint32
+	)
+	int32_sortAtRadix_rec(xs, temp, &is, 1<<7, 24)
 }
 
 // Int32LSB sorts in place the given array of int32 numbers using least
