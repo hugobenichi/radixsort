@@ -2,64 +2,16 @@
 // significant bit.
 package radix
 
-func int64_sortAtRadix(xs, ys []int64, cs, is *[256]uint32, offset int64, shift uint) {
-	for _, x := range xs {
-		r := (offset + (x >> shift)) & 0xFF
-		cs[r]++
-	}
-	a := uint32(0)
-	for i := 0; i < 256; i++ {
-		c := cs[i]
-		is[i] = a
-		a += c
-	}
-	for _, x := range xs {
-		r := (offset + (x >> shift)) & 0xFF
-		ys[is[r]] = x
-		is[r]++
-	}
-	copy(xs, ys)
-}
-
 func Int64MSB(xs []int64) {
 	if len(xs) <= 64 {
 		int64_insertion(xs)
 		return
 	}
-
 	var (
-		cs, is [256]uint32
-		ys     = make([]int64, len(xs))
+		temp = make([]int64, len(xs))
+		is   [256]uint32
 	)
-	int64_sortAtRadix(xs, ys, &cs, &is, 1<<7, 56)
-
-	// partially sort every radix bucket by with secondary radix sort when count is too high
-	var lo uint32
-	for i := 0; i < 256; i++ {
-		var (
-			c  = cs[i]
-			hi = lo + c
-			zs = xs[lo:hi]
-		)
-		lo = hi
-
-		if c < 2 { // already sorted
-			continue
-		}
-		if c > 20000 {
-			for i := 0; i < 256; i++ {
-				is[i] = 0
-			}
-			int64_sortAtRadix(zs, ys, &is, &is, 0, 40)
-		}
-		if c > 100 {
-			for i := 0; i < 256; i++ {
-				is[i] = 0
-			}
-			int64_sortAtRadix(zs, ys, &is, &is, 0, 48)
-		}
-		int64_insertion(zs) // ~linear runtime when globally sorted, locally not-sorted
-	}
+	int64_sortAtRadix_rec(xs, temp, &is, 1<<7, 56)
 }
 
 func int64_sortAtRadix_rec(xs, temp []int64, is *[256]uint32, offset int64, shift uint) {
@@ -96,23 +48,11 @@ func int64_sortAtRadix_rec(xs, temp []int64, is *[256]uint32, offset int64, shif
 		switch {
 		case c < 2: // already sorted
 		case c <= 100:
-			int64_insertion(zs)
+			int64_insertion(zs) // ~linear runtime when globally sorted, locally not-sorted
 		default:
 			int64_sortAtRadix_rec(zs, temp, is, 0, shift-8)
 		}
 	}
-}
-
-func Int64MSB_alt(xs []int64) {
-	if len(xs) <= 64 {
-		int64_insertion(xs)
-		return
-	}
-	var (
-		temp = make([]int64, len(xs))
-		is   [256]uint32
-	)
-	int64_sortAtRadix_rec(xs, temp, &is, 1<<7, 56)
 }
 
 // Int64LSB sorts in place the given array of int64 numbers using least

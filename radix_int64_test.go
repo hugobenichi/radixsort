@@ -9,10 +9,9 @@ func TestInt64Sorting(t *testing.T) {
 	var (
 		sizes  = []int{0, 1, 2, 3, 10, 1e2, 1e3, 1e4, 1e5, 1e6}
 		sorter = map[string]func([]int64){
-			"int64 radix sort MSB (alt)": Int64MSB_alt,
-			"int64 radix sort MSB":       Int64MSB,
-			"int64 radix sort LSB":       Int64LSB,
-			"int64 standard sort":        int64_stdSort,
+			"int64 radix sort MSB": Int64MSB,
+			"int64 radix sort LSB": Int64LSB,
+			"int64 standard sort":  int64_stdSort,
 		}
 	)
 	for _, size := range sizes {
@@ -32,11 +31,6 @@ func Benchmark_Int64_RadixMSB_100(b *testing.B)    { benchmarkInt64(b, Int64MSB,
 func Benchmark_Int64_RadixMSB_1000(b *testing.B)   { benchmarkInt64(b, Int64MSB, 1000) }
 func Benchmark_Int64_RadixMSB_10000(b *testing.B)  { benchmarkInt64(b, Int64MSB, 10000) }
 func Benchmark_Int64_RadixMSB_100000(b *testing.B) { benchmarkInt64(b, Int64MSB, 100000) }
-
-func Benchmark_Int64_RadixMSBalt_100(b *testing.B)    { benchmarkInt64(b, Int64MSB_alt, 100) }
-func Benchmark_Int64_RadixMSBalt_1000(b *testing.B)   { benchmarkInt64(b, Int64MSB_alt, 1000) }
-func Benchmark_Int64_RadixMSBalt_10000(b *testing.B)  { benchmarkInt64(b, Int64MSB_alt, 10000) }
-func Benchmark_Int64_RadixMSBalt_100000(b *testing.B) { benchmarkInt64(b, Int64MSB_alt, 100000) }
 
 func Benchmark_Int64_RadixLSB_100(b *testing.B)    { benchmarkInt64(b, Int64LSB, 100) }
 func Benchmark_Int64_RadixLSB_1000(b *testing.B)   { benchmarkInt64(b, Int64LSB, 1000) }
