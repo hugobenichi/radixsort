@@ -9,8 +9,8 @@ func TestInt32Sorting(t *testing.T) {
 	var (
 		sizes  = []int{0, 1, 2, 3, 10, 1e2, 1e3, 1e4, 1e5, 1e6}
 		sorter = map[string]func([]int32){
-			"int32 radix sort MSB": Int32MSB,
-			"int32 radix sort LSB": Int32LSB,
+			"int32 radix sort MSD": Int32MSD,
+			"int32 radix sort LSD": Int32LSD,
 			"int32 standard sort":  int32_stdSort,
 		}
 	)
@@ -27,15 +27,15 @@ func TestInt32Sorting(t *testing.T) {
 	}
 }
 
-func Benchmark_Int32_RadixMSB_100(b *testing.B)    { benchmarkInt32(b, Int32MSB, 100) }
-func Benchmark_Int32_RadixMSB_1000(b *testing.B)   { benchmarkInt32(b, Int32MSB, 1000) }
-func Benchmark_Int32_RadixMSB_10000(b *testing.B)  { benchmarkInt32(b, Int32MSB, 10000) }
-func Benchmark_Int32_RadixMSB_100000(b *testing.B) { benchmarkInt32(b, Int32MSB, 100000) }
+func Benchmark_Int32_RadixMSD_100(b *testing.B)    { benchmarkInt32(b, Int32MSD, 100) }
+func Benchmark_Int32_RadixMSD_1000(b *testing.B)   { benchmarkInt32(b, Int32MSD, 1000) }
+func Benchmark_Int32_RadixMSD_10000(b *testing.B)  { benchmarkInt32(b, Int32MSD, 10000) }
+func Benchmark_Int32_RadixMSD_100000(b *testing.B) { benchmarkInt32(b, Int32MSD, 100000) }
 
-func Benchmark_Int32_RadixLSB_100(b *testing.B)    { benchmarkInt32(b, Int32LSB, 100) }
-func Benchmark_Int32_RadixLSB_1000(b *testing.B)   { benchmarkInt32(b, Int32LSB, 1000) }
-func Benchmark_Int32_RadixLSB_10000(b *testing.B)  { benchmarkInt32(b, Int32LSB, 10000) }
-func Benchmark_Int32_RadixLSB_100000(b *testing.B) { benchmarkInt32(b, Int32LSB, 100000) }
+func Benchmark_Int32_RadixLSD_100(b *testing.B)    { benchmarkInt32(b, Int32LSD, 100) }
+func Benchmark_Int32_RadixLSD_1000(b *testing.B)   { benchmarkInt32(b, Int32LSD, 1000) }
+func Benchmark_Int32_RadixLSD_10000(b *testing.B)  { benchmarkInt32(b, Int32LSD, 10000) }
+func Benchmark_Int32_RadixLSD_100000(b *testing.B) { benchmarkInt32(b, Int32LSD, 100000) }
 
 func Benchmark_Int32_StandardSort_100(b *testing.B)    { benchmarkInt32(b, int32_stdSort, 100) }
 func Benchmark_Int32_StandardSort_1000(b *testing.B)   { benchmarkInt32(b, int32_stdSort, 1000) }
@@ -44,14 +44,14 @@ func Benchmark_Int32_StandardSort_100000(b *testing.B) { benchmarkInt32(b, int32
 
 func Benchmark_Int32_Insertion_100(b *testing.B) { benchmarkInt32(b, int32_insertion, 100) }
 
-func Benchmark_Int32LastBucket_RadixMSB_10000(b *testing.B) {
-	benchmarkInt32LastBucket(b, Int32MSB, 10000)
+func Benchmark_Int32OneDigit_RadixMSD_10000(b *testing.B) {
+	benchmarkInt32OneDigit(b, Int32MSD, 10000)
 }
-func Benchmark_Int32LastBucket_RadixLSB_10000(b *testing.B) {
-	benchmarkInt32LastBucket(b, Int32LSB, 10000)
+func Benchmark_Int32OneDigit_RadixLSD_10000(b *testing.B) {
+	benchmarkInt32OneDigit(b, Int32LSD, 10000)
 }
-func Benchmark_Int32LastBucket_StandardSort_10000(b *testing.B) {
-	benchmarkInt32LastBucket(b, int32_stdSort, 10000)
+func Benchmark_Int32OneDigit_StandardSort_10000(b *testing.B) {
+	benchmarkInt32OneDigit(b, int32_stdSort, 10000)
 }
 
 func benchmarkInt32(b *testing.B, sorter func([]int32), size int) {
@@ -65,7 +65,7 @@ func benchmarkInt32(b *testing.B, sorter func([]int32), size int) {
 	}
 }
 
-func benchmarkInt32LastBucket(b *testing.B, sorter func([]int32), size int) {
+func benchmarkInt32OneDigit(b *testing.B, sorter func([]int32), size int) {
 	ys := make([][]int32, b.N)
 	for n := range ys {
 		ys[n] = int32_pop(size)

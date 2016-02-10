@@ -2,7 +2,7 @@
 // significant bit.
 package radix
 
-func Int32MSB(xs []int32) {
+func Int32MSD(xs []int32) {
 	if len(xs) <= 64 {
 		int32_insertion(xs)
 		return
@@ -32,7 +32,7 @@ func int32_sortAtRadix_rec(xs, temp []int32, is *[256]uint32, offset int32, shif
 	}
 	copy(xs, temp)
 
-	if shift == 0 { // that was the last radix bucket
+	if shift == 0 { // that was the last radix digit
 		return
 	}
 
@@ -55,11 +55,11 @@ func int32_sortAtRadix_rec(xs, temp []int32, is *[256]uint32, offset int32, shif
 	}
 }
 
-// Int32LSB sorts in place the given array of int32 numbers using least
+// Int32LSD sorts in place the given array of int32 numbers using least
 // significant digit radix sort. It uses additional swap space equal to the
 // given array length. When the length of the given array is equal or less than
 // 64, insertion sort is used instead.
-func Int32LSB(xs []int32) {
+func Int32LSD(xs []int32) {
 	if len(xs) <= 64 {
 		int32_insertion(xs)
 		return

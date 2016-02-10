@@ -9,8 +9,8 @@ func TestInt64Sorting(t *testing.T) {
 	var (
 		sizes  = []int{0, 1, 2, 3, 10, 1e2, 1e3, 1e4, 1e5, 1e6}
 		sorter = map[string]func([]int64){
-			"int64 radix sort MSB": Int64MSB,
-			"int64 radix sort LSB": Int64LSB,
+			"int64 radix sort MSD": Int64MSD,
+			"int64 radix sort LSD": Int64LSD,
 			"int64 standard sort":  int64_stdSort,
 		}
 	)
@@ -27,15 +27,15 @@ func TestInt64Sorting(t *testing.T) {
 	}
 }
 
-func Benchmark_Int64_RadixMSB_100(b *testing.B)    { benchmarkInt64(b, Int64MSB, 100) }
-func Benchmark_Int64_RadixMSB_1000(b *testing.B)   { benchmarkInt64(b, Int64MSB, 1000) }
-func Benchmark_Int64_RadixMSB_10000(b *testing.B)  { benchmarkInt64(b, Int64MSB, 10000) }
-func Benchmark_Int64_RadixMSB_100000(b *testing.B) { benchmarkInt64(b, Int64MSB, 100000) }
+func Benchmark_Int64_RadixMSD_100(b *testing.B)    { benchmarkInt64(b, Int64MSD, 100) }
+func Benchmark_Int64_RadixMSD_1000(b *testing.B)   { benchmarkInt64(b, Int64MSD, 1000) }
+func Benchmark_Int64_RadixMSD_10000(b *testing.B)  { benchmarkInt64(b, Int64MSD, 10000) }
+func Benchmark_Int64_RadixMSD_100000(b *testing.B) { benchmarkInt64(b, Int64MSD, 100000) }
 
-func Benchmark_Int64_RadixLSB_100(b *testing.B)    { benchmarkInt64(b, Int64LSB, 100) }
-func Benchmark_Int64_RadixLSB_1000(b *testing.B)   { benchmarkInt64(b, Int64LSB, 1000) }
-func Benchmark_Int64_RadixLSB_10000(b *testing.B)  { benchmarkInt64(b, Int64LSB, 10000) }
-func Benchmark_Int64_RadixLSB_100000(b *testing.B) { benchmarkInt64(b, Int64LSB, 100000) }
+func Benchmark_Int64_RadixLSD_100(b *testing.B)    { benchmarkInt64(b, Int64LSD, 100) }
+func Benchmark_Int64_RadixLSD_1000(b *testing.B)   { benchmarkInt64(b, Int64LSD, 1000) }
+func Benchmark_Int64_RadixLSD_10000(b *testing.B)  { benchmarkInt64(b, Int64LSD, 10000) }
+func Benchmark_Int64_RadixLSD_100000(b *testing.B) { benchmarkInt64(b, Int64LSD, 100000) }
 
 func Benchmark_Int64_StandardSort_100(b *testing.B)    { benchmarkInt64(b, int64_stdSort, 100) }
 func Benchmark_Int64_StandardSort_1000(b *testing.B)   { benchmarkInt64(b, int64_stdSort, 1000) }
