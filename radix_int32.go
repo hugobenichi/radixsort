@@ -1,7 +1,9 @@
-// package radix provides radix sort for int32 by most significant bit and least
-// significant bit.
-package radix
+package radixsort
 
+// Radix sort for int32. Int32 delegates to least significant digit radix sort.
+func Int32(xs []int32) { Int32LSD(xs) }
+
+// Most significant digit radix sort for int32.
 func Int32MSD(xs []int32) {
 	if len(xs) <= 64 {
 		int32_insertion(xs)
@@ -55,10 +57,7 @@ func int32_sortAtRadix_rec(xs, temp []int32, is *[256]uint32, offset int32, shif
 	}
 }
 
-// Int32LSD sorts in place the given array of int32 numbers using least
-// significant digit radix sort. It uses additional swap space equal to the
-// given array length. When the length of the given array is equal or less than
-// 64, insertion sort is used instead.
+// Least significant digit radix sort for int32.
 func Int32LSD(xs []int32) {
 	if len(xs) <= 64 {
 		int32_insertion(xs)

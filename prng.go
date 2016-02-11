@@ -1,4 +1,4 @@
-package radix
+package radixsort
 
 // xs64s is a xorshift64 star pseudo-random-number-generator to use in tests.
 type xs64s uint64

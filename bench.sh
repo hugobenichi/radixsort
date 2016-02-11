@@ -4,7 +4,7 @@ set -eu
 
 gopath_is_defined=$GOPATH
 
-go test -bench=. radix \
+go test -bench=. radixsort \
   | grep "^Benchmark" \
   | tr '_' ' ' \
   | awk '{print $2, $4, $3, $6}' \

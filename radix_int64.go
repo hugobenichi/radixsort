@@ -1,7 +1,9 @@
-// package radix provides radix sort for int64 by most significant bit and least
-// significant bit.
-package radix
+package radixsort
 
+// Radix sort for int64. Int64 delegates to most significant digit radix sort.
+func Int64(xs []int64) { Int64MSD(xs) }
+
+// Most significant digit radix sort for int64.
 func Int64MSD(xs []int64) {
 	if len(xs) <= 64 {
 		int64_insertion(xs)
@@ -55,10 +57,7 @@ func int64_sortAtRadix_rec(xs, temp []int64, is *[256]uint32, offset int64, shif
 	}
 }
 
-// Int64LSD sorts in place the given array of int64 numbers using least
-// significant digit radix sort. It uses additional swap space equal to the
-// given array length. When the length of the given array is equal or less than
-// 64, insertion sort is used instead.
+// Least significant digit radix sort for int64.
 func Int64LSD(xs []int64) {
 	if len(xs) <= 64 {
 		int64_insertion(xs)
