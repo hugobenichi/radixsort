@@ -26,10 +26,10 @@ func TestIntSorting(t *testing.T) {
 	}
 }
 
-func Benchmark_Int_RadixMSD_100(b *testing.B)    { benchmarkInt(b, Int, 100) }
-func Benchmark_Int_RadixMSD_1000(b *testing.B)   { benchmarkInt(b, Int, 1000) }
-func Benchmark_Int_RadixMSD_10000(b *testing.B)  { benchmarkInt(b, Int, 10000) }
-func Benchmark_Int_RadixMSD_100000(b *testing.B) { benchmarkInt(b, Int, 100000) }
+func Benchmark_Int_Radix_100(b *testing.B)    { benchmarkInt(b, Int, 100) }
+func Benchmark_Int_Radix_1000(b *testing.B)   { benchmarkInt(b, Int, 1000) }
+func Benchmark_Int_Radix_10000(b *testing.B)  { benchmarkInt(b, Int, 10000) }
+func Benchmark_Int_Radix_100000(b *testing.B) { benchmarkInt(b, Int, 100000) }
 
 func Benchmark_Int_StandardSort_100(b *testing.B)    { benchmarkInt(b, sort.Ints, 100) }
 func Benchmark_Int_StandardSort_1000(b *testing.B)   { benchmarkInt(b, sort.Ints, 1000) }

@@ -13,6 +13,6 @@ func Int(xs []int) {
 
 // Radix sort for uint. Uint delegates to uint32 least significant digit radix sort.
 // Only works on 32bits architectures.
-func Uint(xs []int) {
+func Uint(xs []uint) {
 	Uint32LSD(*(*[]uint32)(unsafe.Pointer(&xs)))
 }

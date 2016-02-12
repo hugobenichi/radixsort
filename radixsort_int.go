@@ -12,6 +12,6 @@ func Int(xs []int) {
 
 // Radix sort for uint. Uint delegates to uint64 most significant digit radix sort.
 // Only works on 64bits architectures.
-func Uint(xs []int) {
+func Uint(xs []uint) {
 	Uint64MSD(*(*[]uint64)(unsafe.Pointer(&xs)))
 }
