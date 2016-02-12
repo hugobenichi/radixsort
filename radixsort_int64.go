@@ -1,7 +1,14 @@
 package radixsort
 
+import (
+	"unsafe"
+)
+
 // Radix sort for int64. Int64 delegates to most significant digit radix sort.
 func Int64(xs []int64) { Int64MSD(xs) }
+
+// Radix sort for uint64. Uint64 delegates to most significant digit radix sort.
+func Uint64(xs []uint64) { Uint64MSD(xs) }
 
 // Most significant digit radix sort for int64.
 func Int64MSD(xs []int64) {
@@ -13,10 +20,41 @@ func Int64MSD(xs []int64) {
 		temp = make([]int64, len(xs))
 		is   [256]uint32
 	)
-	int64_sortAtRadix_rec(xs, temp, &is, 1<<7, 56)
+	int64_most_significant_digit(xs, temp, &is, 1<<7, 56)
 }
 
-func int64_sortAtRadix_rec(xs, temp []int64, is *[256]uint32, offset int64, shift uint) {
+// Most significant digit radix sort for uint64.
+func Uint64MSD(xs []uint64) {
+	if len(xs) <= 64 {
+		uint64_insertion(xs)
+		return
+	}
+	var (
+		temp = make([]int64, len(xs))
+		is   [256]uint32
+	)
+	int64_most_significant_digit(*(*[]int64)(unsafe.Pointer(&xs)), temp, &is, 0, 56)
+}
+
+// Least significant digit radix sort for int64.
+func Int64LSD(xs []int64) {
+	if len(xs) <= 64 {
+		int64_insertion(xs)
+		return
+	}
+	int64_least_significant_digit(xs, 1<<7)
+}
+
+// Least significant digit radix sort for uint64.
+func Uint64LSD(xs []uint64) {
+	if len(xs) <= 64 {
+		uint64_insertion(xs)
+		return
+	}
+	int64_least_significant_digit(*(*[]int64)(unsafe.Pointer(&xs)), 0)
+}
+
+func int64_most_significant_digit(xs, temp []int64, is *[256]uint32, offset int64, shift uint) {
 	var cs [256]uint32
 	for _, x := range xs {
 		r := (offset + (x >> shift)) & 0xFF
@@ -52,18 +90,12 @@ func int64_sortAtRadix_rec(xs, temp []int64, is *[256]uint32, offset int64, shif
 		case c <= 100:
 			int64_insertion(zs) // ~linear runtime when globally sorted, locally not-sorted
 		default:
-			int64_sortAtRadix_rec(zs, temp, is, 0, shift-8)
+			int64_most_significant_digit(zs, temp, is, 0, shift-8)
 		}
 	}
 }
 
-// Least significant digit radix sort for int64.
-func Int64LSD(xs []int64) {
-	if len(xs) <= 64 {
-		int64_insertion(xs)
-		return
-	}
-
+func int64_least_significant_digit(xs []int64, offsetMSD int64) {
 	var css [8][256]uint32 // should be living on the stack
 
 	// count all radix keys
@@ -76,7 +108,7 @@ func Int64LSD(xs []int64) {
 			e = (x >> 32) & 0xFF
 			f = (x >> 40) & 0xFF
 			g = (x >> 48) & 0xFF
-			h = ((1 << 7) + (x >> 56)) & 0xFF // translate by +128 for signed order
+			h = (offsetMSD + (x >> 56)) & 0xFF // translate by +128 for signed order
 		)
 		css[0][a]++
 		css[1][b]++
@@ -102,7 +134,7 @@ func Int64LSD(xs []int64) {
 	var (
 		ys = make([]int64, len(xs)) // temp array for swapping elements
 		ss = [8]uint{0, 8, 16, 24, 32, 40, 48, 56}
-		os = [8]int64{0, 0, 0, 0, 0, 0, 0, 1 << 7}
+		os = [8]int64{0, 0, 0, 0, 0, 0, 0, offsetMSD}
 	)
 	for i := range css {
 		var (
@@ -121,6 +153,17 @@ func Int64LSD(xs []int64) {
 }
 
 func int64_insertion(xs []int64) {
+	for i := 1; i < len(xs); i++ {
+		j, x := i, xs[i]
+		for j > 0 && xs[j-1] > x {
+			xs[j] = xs[j-1]
+			j--
+		}
+		xs[j] = x
+	}
+}
+
+func uint64_insertion(xs []uint64) {
 	for i := 1; i < len(xs); i++ {
 		j, x := i, xs[i]
 		for j > 0 && xs[j-1] > x {
