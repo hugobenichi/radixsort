@@ -63,7 +63,10 @@ func Int32LSD(xs []int32) {
 		int32_insertion(xs)
 		return
 	}
+	int32_least_significant_digit(xs, 1<<7)
+}
 
+func int32_least_significant_digit(xs []int32, offsetMSD int32) {
 	var css [4][256]uint32 // should be living on the stack
 
 	// count all radix keys
@@ -72,7 +75,7 @@ func Int32LSD(xs []int32) {
 			a = x & 0xFF
 			b = (x >> 8) & 0xFF
 			c = (x >> 16) & 0xFF
-			d = ((1 << 7) + (x >> 24)) & 0xFF // translate by +128 for signed order
+			d = (offsetMSD + (x >> 24)) & 0xFF // translate by +128 for signed order
 		)
 		css[0][a]++
 		css[1][b]++
@@ -94,7 +97,7 @@ func Int32LSD(xs []int32) {
 	var (
 		ys = make([]int32, len(xs)) // temp array for swapping elements
 		ss = [4]uint{0, 8, 16, 24}
-		os = [4]int32{0, 0, 0, 1 << 7}
+		os = [4]int32{0, 0, 0, offsetMSD}
 	)
 	for i := range css {
 		var (
