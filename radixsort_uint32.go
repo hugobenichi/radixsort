@@ -1,5 +1,9 @@
 package radixsort
 
+import (
+	"unsafe"
+)
+
 // Radix sort for uint32. Uint32 delegates to least significant digit radix sort.
 func Uint32(xs []uint32) { Uint32LSD(xs) }
 
@@ -10,51 +14,10 @@ func Uint32MSD(xs []uint32) {
 		return
 	}
 	var (
-		temp = make([]uint32, len(xs))
+		temp = make([]int32, len(xs))
 		is   [256]uint32
 	)
-	uint32_sortAtRadix_rec(xs, temp, &is, 24)
-}
-
-func uint32_sortAtRadix_rec(xs, temp []uint32, is *[256]uint32, shift uint) {
-	var cs [256]uint32
-	for _, x := range xs {
-		r := (x >> shift) & 0xFF
-		cs[r]++
-	}
-	a := uint32(0)
-	for i := 0; i < 256; i++ {
-		is[i] = a
-		a += cs[i]
-	}
-	for _, x := range xs {
-		r := (x >> shift) & 0xFF
-		temp[is[r]] = x
-		is[r]++
-	}
-	copy(xs, temp)
-
-	if shift == 0 { // that was the last radix digit
-		return
-	}
-
-	var lo uint32
-	for i := 0; i < 256; i++ {
-		var (
-			c  = cs[i]
-			hi = lo + c
-			zs = xs[lo:hi]
-		)
-		lo = hi
-
-		switch {
-		case c < 2: // already sorted
-		case c <= 100:
-			uint32_insertion(zs) // ~linear runtime when globally sorted, locally not-sorted
-		default:
-			uint32_sortAtRadix_rec(zs, temp, is, shift-8)
-		}
-	}
+	int32_sortAtRadix_rec(*(*[]int32)(unsafe.Pointer(&xs)), temp, &is, 0, 24)
 }
 
 // Least significant digit radix sort for uint32.
