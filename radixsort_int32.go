@@ -1,7 +1,14 @@
 package radixsort
 
+import (
+	"unsafe"
+)
+
 // Radix sort for int32. Int32 delegates to least significant digit radix sort.
 func Int32(xs []int32) { Int32LSD(xs) }
+
+// Radix sort for uint32. Uint32 delegates to least significant digit radix sort.
+func Uint32(xs []uint32) { Uint32LSD(xs) }
 
 // Most significant digit radix sort for int32.
 func Int32MSD(xs []int32) {
@@ -13,10 +20,41 @@ func Int32MSD(xs []int32) {
 		temp = make([]int32, len(xs))
 		is   [256]uint32
 	)
-	int32_sortAtRadix_rec(xs, temp, &is, 1<<7, 24)
+	int32_most_significant_digit(xs, temp, &is, 1<<7, 24)
 }
 
-func int32_sortAtRadix_rec(xs, temp []int32, is *[256]uint32, offset int32, shift uint) {
+// Most significant digit radix sort for uint32.
+func Uint32MSD(xs []uint32) {
+	if len(xs) <= 64 {
+		uint32_insertion(xs)
+		return
+	}
+	var (
+		temp = make([]int32, len(xs))
+		is   [256]uint32
+	)
+	int32_most_significant_digit(*(*[]int32)(unsafe.Pointer(&xs)), temp, &is, 0, 24)
+}
+
+// Least significant digit radix sort for int32.
+func Int32LSD(xs []int32) {
+	if len(xs) <= 64 {
+		int32_insertion(xs)
+		return
+	}
+	int32_least_significant_digit(xs, 1<<7)
+}
+
+// Least significant digit radix sort for uint32.
+func Uint32LSD(xs []uint32) {
+	if len(xs) <= 64 {
+		uint32_insertion(xs)
+		return
+	}
+	int32_least_significant_digit(*(*[]int32)(unsafe.Pointer(&xs)), 0)
+}
+
+func int32_most_significant_digit(xs, temp []int32, is *[256]uint32, offset int32, shift uint) {
 	var cs [256]uint32
 	for _, x := range xs {
 		r := (offset + (x >> shift)) & 0xFF
@@ -52,18 +90,9 @@ func int32_sortAtRadix_rec(xs, temp []int32, is *[256]uint32, offset int32, shif
 		case c <= 100:
 			int32_insertion(zs) // ~linear runtime when globally sorted, locally not-sorted
 		default:
-			int32_sortAtRadix_rec(zs, temp, is, 0, shift-8)
+			int32_most_significant_digit(zs, temp, is, 0, shift-8)
 		}
 	}
-}
-
-// Least significant digit radix sort for int32.
-func Int32LSD(xs []int32) {
-	if len(xs) <= 64 {
-		int32_insertion(xs)
-		return
-	}
-	int32_least_significant_digit(xs, 1<<7)
 }
 
 func int32_least_significant_digit(xs []int32, offsetMSD int32) {
@@ -116,6 +145,17 @@ func int32_least_significant_digit(xs []int32, offsetMSD int32) {
 }
 
 func int32_insertion(xs []int32) {
+	for i := 1; i < len(xs); i++ {
+		j, x := i, xs[i]
+		for j > 0 && xs[j-1] > x {
+			xs[j] = xs[j-1]
+			j--
+		}
+		xs[j] = x
+	}
+}
+
+func uint32_insertion(xs []uint32) {
 	for i := 1; i < len(xs); i++ {
 		j, x := i, xs[i]
 		for j > 0 && xs[j-1] > x {
