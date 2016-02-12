@@ -30,10 +30,11 @@ additional digits, while MSD radix sort have almost identical performances.
 
 Both LSD and MSD have runtime roughly linear to the size of the array,
 as expected.
-They perform quite a lot better than standard sort for a wide range of sizes:
+They perform quite a lot better than standard sort for a wide range of sizes (on
+my machine):
 
 | type   | array size | algorithm    | ns/op    |
-| ---    | ---        | ---          | ---      |
+| ---    | ---:       | :---:        | ---:     |
 | Int    | 100000     | Radix        |  1984536 |
 | Int    | 100000     | StandardSort | 21836864 |
 | Int    | 10000      | Radix        |   250743 |
